@@ -1,9 +1,11 @@
 let routes = require('express').Router();
+
 let Clown = require('../models/clown')
+
 routes.route("/clowns/:id?")
   .get(function (req, res) {
     if (req.params.id) {
-      Clown.getClown(req.params.id, handleResponse)
+      Clown.findClownAndItLocations(req.params.id, handleResponse)
       return
     }
     Clown.getClowns(handleResponse)
@@ -39,5 +41,26 @@ routes.route("/clowns/:id?")
       res.send({message: 'successfully killed that terrible clown, for now....'})
     })
   })
+
+routes.route('/clowns/:id/details')
+  .get(function(req, res){
+    Clown.findClownAndItLocations(req.params.id, function(err, clown){
+      if(err){ return res.send(err) }
+      res.send(clown)
+    })
+    
+  })
+
+routes.route('/clown/spotted')
+  .post(function(req, res){
+    Clown.addSighting(req.body.sighting, function(err, clown){
+      if(err){ return res.send(err) }
+      res.send(clown)
+    })
+    
+  })
+
+
+
 
 module.exports = { routes }
